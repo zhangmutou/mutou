@@ -1,0 +1,135 @@
+﻿本节知识点：
+
+多层框架或窗口的定位：
+
+    switch_to_frame()
+    switch_to_window()
+
+智能等待：
+
+    implicitly_wait()
+
+==================================================
+
+对于一个现代的web应用，经常会出现框架（frame） 或窗口（window）的应用，这也就给我们的定位带来了一个难题。
+
+有时候我们定位一个元素，定位器没有问题，但一直定位不了，这时候就要检查这个元素是否在一个frame中，seelnium  webdriver 提供了一个switch_to_frame方法，可以很轻松的来解决这个问题。
+
+ 
+==================================================
+frame.html
+
+
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<title>frame</title>
+<script type="text/javascript" async=""
+src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
+"></script>
+<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" />
+<script type="text/javascript">
+$(document).ready(function(){
+});
+</script>
+</head>
+<body>
+<div class="row-fluid">
+<div class="span10 well">
+<h3>frame</h3>
+<iframe id="f1" src="inner.html" width="800",
+height="600"></iframe>
+</div>
+</div>
+</body>
+<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+</html>
+
+==================================================
+
+inner.html
+
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<title>inner</title>
+</head>
+<body>
+<div class="row-fluid">
+<div class="span6 well">
+<h3>inner</h3>
+<iframe id="f2" src="http://www.baidu.com" width="700"
+height="500"></iframe>
+<a href="javascript:alert('watir-webdriver better than
+selenium webdriver;')">click</a>
+</div>
+</div>
+</body>
+</html>
+
+==================================================
+
+frame.html 中嵌套inner.html ，两个文件和我们的脚本文件放同一个目录下：
+
+
+switch_to_frame()
+
+操作上面页面，代码如下：
+
+
+#coding=utf-8
+from selenium import webdriver
+import time
+import os
+
+browser = webdriver.Firefox()
+file_path =  'file:///' + os.path.abspath('frame.html')
+browser.get(file_path)
+
+browser.implicitly_wait(30)
+#先找到到ifrome1（id = f1）
+browser.switch_to_frame("f1")
+#再找到其下面的ifrome2(id =f2)
+browser.switch_to_frame("f2")
+
+
+#下面就可以正常的操作元素了
+browser.find_element_by_id("kw").send_keys("selenium")
+browser.find_element_by_id("su").click()
+time.sleep(3)
+
+browser.quit()
+
+==================================================
+
+driver.switch_to_window()
+
+ 
+
+有可能嵌套的不是框架，而是窗口，还有真对窗口的方法：switch_to_window
+
+用法与switch_to_frame 相同：
+
+driver.switch_to_window("windowName")
+
+ 
+
+ 
+
+implicitly_wait()
+
+ 
+
+细心的话会发现上面的例子中有browser.implicitly_wait(30)，它的用法应该比time.sleep() 更智能，后者只能选择一个固定的时间的等待，前者可以在一个时间范围内智能的等待。
+
+文档解释：
+
+selenium.webdriver.remote.webdriver.implicitly_wait(time_to_wait)
+
+隐式地等待一个无素被发现或一个命令完成；这个方法每次会话只需要调用一次
+
+time_to_wait: 等待时间
+
+用法:
+
+driver.implicitly_wait(30)

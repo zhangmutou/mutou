@@ -1,0 +1,138 @@
+﻿本节重点：
+
+调用js方法
+
+    execute_script(script, *args)
+
+在当前窗口/框架 同步执行javaScript
+
+脚本：JavaScript的执行。
+
+*参数：适用任何JavaScript脚本。
+
+使用：
+
+driver.execute_script（‘document.title’）
+
+ 
+================================================== 
+ 
+
+使快播登陆用户名输入框标红显示：
+
+
+#coding=utf-8
+from selenium import webdriver
+import time
+
+driver = webdriver.Firefox()
+driver.get("http://passport.kuaibo.com/login/?referrer=http%3A%2F%2Fvod.kuaibo.com%2F%3Ft%3Dhome")
+
+#给用户名的输入框标红
+js="var q=document.getElementById(\"user_name\");q.style.border=\"1px solid red\";"
+#调用js
+driver.execute_script(js)
+time.sleep(3)
+
+driver.find_element_by_id("user_name").send_keys("username")
+driver.find_element_by_id("user_pwd").send_keys("password")
+driver.find_element_by_id("dl_an_submit").click()
+time.sleep(3)
+
+driver.quit()
+
+
+
+js解释：
+
+q=document.getElementById(\"user_name\")
+
+元素q的id 为user_name
+
+q.style.border=\"1px solid red\
+
+元素q的样式，边框为1个像素红色
+
+ 
+
+ 
+
+隐藏元素
+
+js.html
+
+
+<html>
+    <head>
+      <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+      <title>js</title>     
+      <script type="text/javascript" async="" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+      <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" />        
+      <script type="text/javascript">
+        $(document).ready(function(){
+          $('#tooltip').tooltip({"placement": "right"});
+        });
+      </script>
+    </head>
+
+    <body>
+      <h3>js</h3>
+      <div class="row-fluid">
+        <div class="span6 well">        
+          <a id="tooltip" href="#" data-toggle="tooltip" title=" selenium-webdriver(python)">hover to see tooltip</a>
+          <a class="btn">Button</a>
+        </div>      
+      </div>        
+    </body>
+    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+  </html>
+
+
+
+(保持html文件与执行脚本在同一目录下)
+
+ 
+
+执行js一般有两种场景：
+
+    一种是在页面上直接执行JS
+    另一种是在某个已经定位的元素上执行JS
+
+ 
+
+
+#coding=utf-8
+from selenium import webdriver 
+import time,os
+
+driver = webdriver.Firefox()
+file_path =  'file:///' + os.path.abspath('js.html')
+driver.get(file_path)
+
+#######通过JS 隐藏选中的元素#########
+#第一种方法：
+driver.execute_script('$("#tooltip").fadeOut();')
+time.sleep(5)
+
+#第二种方法：
+button = driver.find_element_by_class_name('btn')
+driver.execute_script('$(arguments[0]).fadeOut()',button)
+time.sleep(5)
+
+driver.quit()
+
+
+
+ 
+
+js解释：
+
+arguments对象，它是调用对象的一个特殊属性，用来引用Arguments对象。Arugments对象就像数组。
+
+fadeOut() 方法使用淡出效果来隐藏被选元素，假如该元素是隐藏的。
+
+ 
+
+PS:可以看到js 可以做selenium 做不到的事情，但是在什么样的自动化的时候才能（或必须）要js帮忙，我还没遇到过。不过js可以selenium完成更强大的功能，这是不容置疑的。
+
+另外，之前没有学过JS ，所以js代码很陌生。如果有时间的话也建议各位同学补充这方面的知识。UI自动化离不开前端技术。
